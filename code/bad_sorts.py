@@ -90,7 +90,7 @@ def find_min_index(L, n):
 
 
 def experiment1():
-    lengths = (100 * x for x in range(30))
+    lengths = [100 * x for x in range(30)]
     max_value = 2 ** 30
     randomLists = [create_random_list(x,max_value) for x in lengths]
     n = len(lengths)
@@ -127,7 +127,22 @@ def experiment1():
 
     plt.plot(lengths, bubbleData, color='blue')
     plt.title('Bubble sort')
+    plt.xlabel("List Length")
+    plt.ylabel("Time in seconds")
     plt.show()
 
+    plt.plot(lengths, insertionData, color='red')
+    plt.title('Insertion sort')
+    plt.xlabel("List Length")
+    plt.ylabel("Time in seconds")
+    plt.show()
+
+    plt.plot(lengths, selectionData, color='green')
+    plt.title('Selection sort')
+    plt.xlabel("List Length")
+    plt.ylabel("Time in seconds")
+    plt.show()
 
     return
+
+experiment1()
