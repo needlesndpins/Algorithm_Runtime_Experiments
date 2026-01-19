@@ -3,7 +3,8 @@ This file corresponds to the first graded lab of 2XC3.
 Feel free to modify and/or add functions to this file.
 """
 import random
-
+import matplotlib.pyplot as plt
+import timeit
 
 # Create a random list length "length" containing whole numbers between 0 and max_value inclusive
 def create_random_list(length, max_value):
@@ -86,3 +87,47 @@ def find_min_index(L, n):
         if L[i] < L[min_index]:
             min_index = i
     return min_index
+
+
+def experiment1():
+    lengths = (100 * x for x in range(30))
+    max_value = 2 ** 30
+    randomLists = [create_random_list(x,max_value) for x in lengths]
+    n = len(lengths)
+    bubbleData = []
+    selectionData = []
+    insertionData = []
+    bubbleTotal = 0
+    selectionTotal = 0
+    insertionTotal = 0
+
+    for i in range(n):
+        L = randomLists[i]
+
+        start = timeit.default_timer()
+        bubble_sort(L)
+        end = timeit.default_timer() - start
+        bubbleTotal += end
+        bubbleData.append(end)
+
+        start = timeit.default_timer()
+        insertion_sort(L)
+        end = timeit.default_timer() - start
+        insertionTotal += end
+        insertionData.append(end)
+
+        start = timeit.default_timer()
+        selection_sort(L)
+        end = timeit.default_timer() - start
+        selectionTotal += end
+        selectionData.append(end)
+
+
+
+
+    plt.plot(lengths, bubbleData, color='blue')
+    plt.title('Bubble sort')
+    plt.show()
+
+
+    return
