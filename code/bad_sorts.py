@@ -5,6 +5,7 @@ Feel free to modify and/or add functions to this file.
 import random
 import matplotlib.pyplot as plt
 import timeit
+import copy
 
 # Create a random list length "length" containing whole numbers between 0 and max_value inclusive
 def create_random_list(length, max_value):
@@ -72,6 +73,17 @@ def bubble_sort(L):
                 swap(L, j, j+1)
 
 
+# Updated Bubble Sort (Our code)
+def bubble_sort2(L):
+    for i in range(len(L)):
+        swapped = False
+        for j in range(len(L) - 1 - i):
+            if L[j] > L[j+1]:
+                swap(L, j, j+1)
+                swapped = True
+        if not swapped:
+            break
+
 # ******************* Selection sort code *******************
 
 # Traditional Selection sort
@@ -88,6 +100,10 @@ def find_min_index(L, n):
             min_index = i
     return min_index
 
+# Updated Selection Sort (Our code)
+
+
+# ******************* Experiment Code (Our Code) ********************
 
 def experiment1():
     lengths = [100 * x for x in range(30)]
@@ -145,4 +161,44 @@ def experiment1():
 
     return
 
-experiment1()
+
+def experiment2():
+    lengths = [100 * x for x in range(30)]
+    max_value = 2 ** 30
+    randomLists = [create_random_list(x,max_value) for x in lengths]
+    n = len(lengths)
+
+    tradBubbleData = []
+    updBubbleData = []
+    tradBubbleTotal = 0
+    updBubbleTotal = 0
+
+    for i in range(n):
+        L = randomLists[i]
+        L1 = copy.deepcopy(L)
+        L2 = copy.deepcopy(L)
+
+        start = timeit.default_timer()
+        bubble_sort(L1)
+        end = timeit.default_timer() - start
+        tradBubbleTotal += end
+        tradBubbleData.append(end)
+
+        start = timeit.default_timer()
+        bubble_sort2(L2)
+        end = timeit.default_timer() - start
+        updBubbleTotal += end
+        updBubbleData.append(end)
+
+    plt.plot(lengths, tradBubbleData, color='blue', label='Traditional Bubble Sort Avg time = ' + str(tradBubbleTotal/n))
+    plt.plot(lengths, updBubbleData, color='red', label='Updated Bubble Sort Avg time = ' + str(updBubbleTotal/n))
+    plt.xlabel("List Length")
+    plt.ylabel("Time in seconds")
+    plt.legend()
+    plt.show()
+
+    return
+
+
+#Running the experiments
+experiment2()
