@@ -5,6 +5,7 @@ Feel free to modify and/or add functions to this file.
 import random
 import matplotlib.pyplot as plt
 import timeit
+import copy
 
 # Create a random list length "length" containing whole numbers between 0 and max_value inclusive
 def create_random_list(length, max_value):
@@ -78,15 +79,69 @@ def bubble_sort(L):
 def selection_sort(L):
     for i in range(len(L)):
         min_index = find_min_index(L, i)
-        swap(L, i, min_index)
+        swap(L, i, min_index) #Swap L[i] and L[min_index]
 
 
 def find_min_index(L, n):
     min_index = n
-    for i in range(n+1, len(L)):
+    for i in range(n+1, len(L)): #Check everything to right of position n
         if L[i] < L[min_index]:
             min_index = i
     return min_index
+
+
+# ******************* Improved Selection sort code *******************
+
+# Input: 
+#  L - Array
+#  j - Current index
+#  k - Largest index filled (So check up to k-1)
+def find_min_and_max_index(L,j,k):
+    min_ind = j
+    max_ind = j
+
+    for i in range(j + 1, k): 
+        if L[i] < L[min_ind]: 
+            min_ind = i
+
+        elif L[max_ind] < L[i]: 
+            max_ind = i
+
+    return (min_ind,max_ind)
+
+# Improved Selection sort
+# Instead of having selection sort keep track of the minimum value during a single iteration and
+# positioning it accordingly, have it keep track of the min and max value of a single iteration and
+# position both values accordingly. Note, your loop boundaries should be updated accordingly as
+# well. Ask the TA for clarification if things are not clear
+
+# Find max element and min element and put in their respective positions 
+# Keep track of the max and min index (Already put element there)
+#   - Put max element at N-1, then the current possible max index is N-2
+#   - Put min element at 0, then the current possible min index is 1
+def selection_sort2(L): 
+    if len(L) == 0: 
+        return -1
+    
+    largest_filled = len(L) 
+    i = 0
+
+    # current index is less than the place where max element is
+    while i < largest_filled - 1:
+
+        min_index, max_index = find_min_and_max_index(L,i,largest_filled)
+
+        swap(L,max_index,largest_filled - 1)
+
+        # Min element was at end of available entries, so max element was swapped there
+        # Thus the min element is now at the place where the max element was
+        if min_index == largest_filled - 1: 
+            min_index = max_index
+
+        swap(L,i,min_index)
+
+        largest_filled -= 1
+        i += 1
 
 
 def experiment1():
@@ -103,6 +158,8 @@ def experiment1():
 
     for i in range(n):
         L = randomLists[i]
+        L1 = copy.deepcopy(L)
+        L2 = copy.deepcopy(L)
 
         start = timeit.default_timer()
         bubble_sort(L)
@@ -110,11 +167,53 @@ def experiment1():
         bubbleTotal += end
         bubbleData.append(end)
 
+        # start = timeit.default_timer()
+        # insertion_sort(L)
+        # end = timeit.default_timer() - start
+        # insertionTotal += end
+        # insertionData.append(end)
+
         start = timeit.default_timer()
-        insertion_sort(L)
+        selection_sort(L1)
+        end = timeit.default_timer() - start
+        selectionTotal += end
+        selectionData.append(end)
+
+        start = timeit.default_timer()
+        insertion_sort(L2)
         end = timeit.default_timer() - start
         insertionTotal += end
         insertionData.append(end)
+
+
+
+
+    plt.plot(lengths, bubbleData, color='blue', label = "Bubble sort")
+    plt.plot(lengths, insertionData, color='red', label = "Insertion sort")
+    plt.plot(lengths, selectionData, color='green', label = "Selection sort")
+
+    plt.xlabel("List Length")
+    plt.ylabel("Time (s)")
+    plt.title("Runtime analysis")
+    plt.legend()
+    plt.show()
+
+    return
+
+def experiment2():
+    lengths = [100 * x for x in range(30)]
+    max_value = 2 ** 30
+    randomLists = [create_random_list(x,max_value) for x in lengths]
+    n = len(lengths)
+    selectionData = []
+    selectionImprovedData = []
+    selectionTotal = 0
+    selectionImprovedTotal = 0
+
+    for i in range(n):
+        L = randomLists[i]
+        L1 = copy.deepcopy(L)
+
 
         start = timeit.default_timer()
         selection_sort(L)
@@ -122,27 +221,22 @@ def experiment1():
         selectionTotal += end
         selectionData.append(end)
 
+        start = timeit.default_timer()
+        selection_sort2(L1)
+        end = timeit.default_timer() - start
+        selectionImprovedTotal += end
+        selectionImprovedData.append(end)
 
 
 
-    plt.plot(lengths, bubbleData, color='blue')
-    plt.title('Bubble sort')
+
+    plt.plot(lengths, selectionData, color='blue', label = "Selection sort " + str(round(selectionTotal/n,4)))
+    plt.plot(lengths, selectionImprovedData, color='red', label = "Improved Selection sort " + str(round(selectionImprovedTotal/n,4)) )
+
     plt.xlabel("List Length")
-    plt.ylabel("Time in seconds")
+    plt.ylabel("Time (s)")
+    plt.title("Runtime analysis")
+    plt.legend()
     plt.show()
 
-    plt.plot(lengths, insertionData, color='red')
-    plt.title('Insertion sort')
-    plt.xlabel("List Length")
-    plt.ylabel("Time in seconds")
-    plt.show()
-
-    plt.plot(lengths, selectionData, color='green')
-    plt.title('Selection sort')
-    plt.xlabel("List Length")
-    plt.ylabel("Time in seconds")
-    plt.show()
-
-    return
-
-experiment1()
+experiment2()
