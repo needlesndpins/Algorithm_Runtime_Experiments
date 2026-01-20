@@ -6,6 +6,7 @@ import random
 import matplotlib.pyplot as plt
 import timeit
 import copy
+import math
 
 # Create a random list length "length" containing whole numbers between 0 and max_value inclusive
 def create_random_list(length, max_value):
@@ -278,5 +279,57 @@ def experiment2():
     return
 
 
+def experiment3():
+    length = 1250
+    max_value = 2 ** 10
+    max_swaps = 500   # int(length*math.log(length) / 2)
+    nearSortedLists = [create_near_sorted_list(length,max_value,x) for x in range(max_swaps)]
+    n = max_swaps
+    bubbleData = []
+    selectionData = []
+    insertionData = []
+    bubbleTotal = 0
+    selectionTotal = 0
+    insertionTotal = 0
+
+    for i in range(n):
+        L = nearSortedLists[i]
+        L1 = copy.deepcopy(L)
+        L2 = copy.deepcopy(L)
+
+        start = timeit.default_timer()
+        bubble_sort2(L)
+        end = timeit.default_timer() - start
+        bubbleTotal += end
+        bubbleData.append(end)
+
+        start = timeit.default_timer()
+        selection_sort2(L1)
+        end = timeit.default_timer() - start
+        selectionTotal += end
+        selectionData.append(end)
+
+        start = timeit.default_timer()
+        insertion_sort2(L2)
+        end = timeit.default_timer() - start
+        insertionTotal += end
+        insertionData.append(end)
+
+
+
+
+    plt.plot(range(max_swaps), bubbleData, color='blue', label = "Updated Bubble sort Avg time = " + str(round(bubbleTotal/n, 4)))
+    plt.plot(range(max_swaps), insertionData, color='red', label = "Updated Insertion sort Avg time = " + str(round(insertionTotal/n, 4)))
+    plt.plot(range(max_swaps), selectionData, color='green', label = "Updated Selection sort Avg time = " + str(round(selectionTotal/n, 4)))
+
+    plt.xlabel("Swaps")
+    plt.ylabel("Time (s)")
+    plt.title("Runtime analysis")
+    plt.legend()
+    plt.show()
+
+    return
+
+
 #Running the experiments
-experiment2()
+experiment3()
