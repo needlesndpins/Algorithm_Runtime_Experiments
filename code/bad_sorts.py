@@ -102,11 +102,6 @@ def find_min_index(L, n):
 
 # Updated Selection Sort (Our code)
 
-
-# ******************* Experiment Code (Our Code) ********************
-
-# ******************* Improved Selection sort code *******************
-
 # Input: 
 #  L - Array
 #  j - Current index
@@ -125,10 +120,6 @@ def find_min_and_max_index(L,j,k):
     return (min_ind,max_ind)
 
 # Improved Selection sort
-# Instead of having selection sort keep track of the minimum value during a single iteration and
-# positioning it accordingly, have it keep track of the min and max value of a single iteration and
-# position both values accordingly. Note, your loop boundaries should be updated accordingly as
-# well. Ask the TA for clarification if things are not clear
 
 # Find max element and min element and put in their respective positions 
 # Keep track of the max and min index (Already put element there)
@@ -159,6 +150,10 @@ def selection_sort2(L):
         i += 1
 
 
+
+# ******************* Experiment Code (Our Code) ********************
+
+
 def experiment1():
     lengths = [100 * x for x in range(30)]
     max_value = 2 ** 30
@@ -181,12 +176,6 @@ def experiment1():
         end = timeit.default_timer() - start
         bubbleTotal += end
         bubbleData.append(end)
-
-        # start = timeit.default_timer()
-        # insertion_sort(L)
-        # end = timeit.default_timer() - start
-        # insertionTotal += end
-        # insertionData.append(end)
 
         start = timeit.default_timer()
         selection_sort(L1)
@@ -215,6 +204,8 @@ def experiment1():
 
     return
 
+
+
 def experiment2():
     lengths = [100 * x for x in range(30)]
     max_value = 2 ** 30
@@ -228,16 +219,16 @@ def experiment2():
     for i in range(n):
         L = randomLists[i]
         L1 = copy.deepcopy(L)
-
+        L2 = copy.deepcopy(L)
 
         start = timeit.default_timer()
-        selection_sort(L)
+        selection_sort(L1)
         end = timeit.default_timer() - start
         selectionTotal += end
         selectionData.append(end)
 
         start = timeit.default_timer()
-        selection_sort2(L1)
+        selection_sort2(L2)
         end = timeit.default_timer() - start
         selectionImprovedTotal += end
         selectionImprovedData.append(end)
@@ -254,14 +245,6 @@ def experiment2():
     plt.legend()
     plt.show()
 
-    return
-
-
-def experiment2():
-    lengths = [100 * x for x in range(30)]
-    max_value = 2 ** 30
-    randomLists = [create_random_list(x,max_value) for x in lengths]
-    n = len(lengths)
 
     tradBubbleData = []
     updBubbleData = []
@@ -285,8 +268,8 @@ def experiment2():
         updBubbleTotal += end
         updBubbleData.append(end)
 
-    plt.plot(lengths, tradBubbleData, color='blue', label='Traditional Bubble Sort Avg time = ' + str(tradBubbleTotal/n))
-    plt.plot(lengths, updBubbleData, color='red', label='Updated Bubble Sort Avg time = ' + str(updBubbleTotal/n))
+    plt.plot(lengths, tradBubbleData, color='blue', label='Traditional Bubble Sort Avg time = ' + str(round((tradBubbleTotal/n),4)))
+    plt.plot(lengths, updBubbleData, color='red', label='Updated Bubble Sort Avg time = ' + str(round((updBubbleTotal/n),4)))
     plt.xlabel("List Length")
     plt.ylabel("Time in seconds")
     plt.legend()
