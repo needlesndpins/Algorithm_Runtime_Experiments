@@ -15,6 +15,8 @@ import timeit
 import copy
 import math
 import sys
+
+
 sys.setrecursionlimit(10000)
 
 def create_random_list(length, max_value):
@@ -97,7 +99,29 @@ def merge(left, right):
                 j += 1
     return L
 
-# *************************************
+# ********** Iterative Merge Sort *************
+
+def bottom_up_mergesort(L):
+    n = len(L)
+    size = 1
+
+    while size < n:
+        #cutting the list into sublists
+        for start in range(0, n, 2 * size):
+            #min keeps us from accidentaly going to far
+            mid = min(start + size, n)
+            end = min(start + 2 * size, n)
+
+            left = L[start:mid]
+            right = L[mid:end]
+
+            merged = merge(left, right)
+
+            #copy back into L
+            for i in range(len(merged)):
+                L[start + i] = merged[i]
+
+        size *= 2 #double size of blocks w each iteration of outer loop
 
 # ************* Heap Sort *************
 
@@ -175,6 +199,21 @@ class Heap:
         return s
 
 # *************************************
+
+def insertion_sort(L):
+    for i in range(1, len(L)):
+        insert(L, i)
+
+
+def insert(L, i):
+    while i > 0:
+        if L[i] < L[i-1]:
+            swap(L, i-1, i)
+            i -= 1
+        else:
+            return
+
+# ********** Experiments (our code) ********
     
 def experiment4():
     lengths = [2 ** x for x in range(20)]
@@ -299,6 +338,95 @@ def experiment5():
 
     return
 
+def experiment7():
+    lengths = [2 ** x for x in range(20)]
+    max_value = 2 ** 30
+    randomLists = [create_random_list(x,max_value) for x in lengths]
+    n = len(lengths)
+    mergeData = []
+    itMergeData = []
+    mergeTotal = 0
+    itMergeTotal = 0
 
-experiment5()
-# comment
+    for i in range(n):
+        L = randomLists[i]
+        L1 = copy.deepcopy(L)
+        L2 = copy.deepcopy(L)
+
+        start = timeit.default_timer()
+        mergesort(L1)
+        end = timeit.default_timer() - start
+        mergeTotal += end
+        mergeData.append(end)
+
+        start = timeit.default_timer()
+        bottom_up_mergesort(L2)
+        end = timeit.default_timer() - start
+        itMergeTotal += end
+        itMergeData.append(end)
+
+
+
+
+    plt.plot(lengths, mergeData, color='red', label = "Merge sort(recursive) avg time = " + str(round(mergeTotal/n,8)))
+    plt.plot(lengths, itMergeData, color='green', label = "Merge sort(iterative) avg time = " + str(round(itMergeTotal/n,8)))
+
+    plt.xlabel("List Length")
+    plt.ylabel("Time (s)")
+    plt.title("Runtime analysis")
+    plt.legend()
+    plt.show()
+
+    return
+
+def experiment8():
+    lengths = [x for x in range(60)]
+    max_value = 2 ** 30
+    randomLists = [create_random_list(x,max_value) for x in lengths]
+    n = len(lengths)
+    insertionData = []
+    mergeData = []
+    quickData = []
+    insertionTotal = 0
+    mergeTotal = 0
+    quickTotal = 0
+
+    for i in range(n):
+        L = randomLists[i]
+        L1 = copy.deepcopy(L)
+        L2 = copy.deepcopy(L)
+
+        start = timeit.default_timer()
+        insertion_sort(L)
+        end = timeit.default_timer() - start
+        insertionTotal += end
+        insertionData.append(end)
+
+        start = timeit.default_timer()
+        mergesort(L1)
+        end = timeit.default_timer() - start
+        mergeTotal += end
+        mergeData.append(end)
+
+        start = timeit.default_timer()
+        quicksort(L2)
+        end = timeit.default_timer() - start
+        quickTotal += end
+        quickData.append(end)
+
+
+
+
+    plt.plot(lengths, insertionData, color='blue', label = "Insertion sort Avg time = " + str(round(insertionTotal/n,8)))
+    plt.plot(lengths, mergeData, color='red', label = "Merge sort Avg time = " + str(round(mergeTotal/n,8)))
+    plt.plot(lengths, quickData, color='green', label = "Quick sort Avg time = " + str(round(quickTotal/n,8)))
+
+    plt.xlabel("List Length")
+    plt.ylabel("Time (s)")
+    plt.title("Runtime analysis")
+    plt.legend()
+    plt.show()
+
+    return
+
+experiment8()
