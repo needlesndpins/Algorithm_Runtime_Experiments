@@ -247,44 +247,54 @@ def experiment2():
     plt.show()
 
 
-    tradBubbleData = []
-    updBubbleData = []
-    tradBubbleTotal = 0
-    updBubbleTotal = 0
+    # tradBubbleData = []
+    # updBubbleData = []
+    # tradBubbleTotal = 0
+    # updBubbleTotal = 0
 
-    for i in range(n):
-        L = randomLists[i]
-        L1 = copy.deepcopy(L)
-        L2 = copy.deepcopy(L)
+    # for i in range(n):
+    #     L = randomLists[i]
+    #     L1 = copy.deepcopy(L)
+    #     L2 = copy.deepcopy(L)
 
-        start = timeit.default_timer()
-        bubble_sort(L1)
-        end = timeit.default_timer() - start
-        tradBubbleTotal += end
-        tradBubbleData.append(end)
+    #     start = timeit.default_timer()
+    #     bubble_sort(L1)
+    #     end = timeit.default_timer() - start
+    #     tradBubbleTotal += end
+    #     tradBubbleData.append(end)
 
-        start = timeit.default_timer()
-        bubble_sort2(L2)
-        end = timeit.default_timer() - start
-        updBubbleTotal += end
-        updBubbleData.append(end)
+    #     start = timeit.default_timer()
+    #     bubble_sort2(L2)
+    #     end = timeit.default_timer() - start
+    #     updBubbleTotal += end
+    #     updBubbleData.append(end)
 
-    plt.plot(lengths, tradBubbleData, color='blue', label='Traditional Bubble Sort Avg time = ' + str(round((tradBubbleTotal/n),4)))
-    plt.plot(lengths, updBubbleData, color='red', label='Updated Bubble Sort Avg time = ' + str(round((updBubbleTotal/n),4)))
-    plt.xlabel("List Length")
-    plt.ylabel("Time in seconds")
-    plt.legend()
-    plt.show()
+    # plt.plot(lengths, tradBubbleData, color='blue', label='Traditional Bubble Sort Avg time = ' + str(round((tradBubbleTotal/n),4)))
+    # plt.plot(lengths, updBubbleData, color='red', label='Updated Bubble Sort Avg time = ' + str(round((updBubbleTotal/n),4)))
+    # plt.xlabel("List Length")
+    # plt.ylabel("Time in seconds")
+    # plt.legend()
+    # plt.show()
 
     return
 
 
 def experiment3():
-    length = 1250
-    max_value = 2 ** 10
-    max_swaps = 500   # int(length*math.log(length) / 2)
-    nearSortedLists = [create_near_sorted_list(length,max_value,x) for x in range(max_swaps)]
-    n = max_swaps
+
+    length = 5000
+    max_value = 2 ** 30
+    max_swaps = int(length*math.log(length) / 2)
+    #nearSortedLists = [create_near_sorted_list(length,max_value,x) for x in range(max_swaps)]
+    num_swaps = []
+    nearSortedLists = []
+    for x in range(0,max_swaps,int(max_swaps/25)): 
+        nearSortedLists.append(create_near_sorted_list(length,max_value,x))
+        num_swaps.append(x)
+
+
+    #n = max_swaps
+    n = len(nearSortedLists)
+    print(n)
     bubbleData = []
     selectionData = []
     insertionData = []
@@ -293,6 +303,7 @@ def experiment3():
     insertionTotal = 0
 
     for i in range(n):
+        print(i)
         L = nearSortedLists[i]
         L1 = copy.deepcopy(L)
         L2 = copy.deepcopy(L)
@@ -318,10 +329,15 @@ def experiment3():
 
 
 
-    plt.plot(range(max_swaps), bubbleData, color='blue', label = "Updated Bubble sort Avg time = " + str(round(bubbleTotal/n, 4)))
-    plt.plot(range(max_swaps), insertionData, color='red', label = "Updated Insertion sort Avg time = " + str(round(insertionTotal/n, 4)))
-    plt.plot(range(max_swaps), selectionData, color='green', label = "Updated Selection sort Avg time = " + str(round(selectionTotal/n, 4)))
+    # plt.plot(range(max_swaps), bubbleData, color='blue', label = "Updated Bubble sort Avg time = " + str(round(bubbleTotal/n, 4)))
+    # plt.plot(range(max_swaps), insertionData, color='red', label = "Updated Insertion sort Avg time = " + str(round(insertionTotal/n, 4)))
+    # plt.plot(range(max_swaps), selectionData, color='green', label = "Updated Selection sort Avg time = " + str(round(selectionTotal/n, 4)))
 
+    # Need to accurately capture number of swaps per iteration, this doesn't do that
+    plt.plot(num_swaps, bubbleData, color='blue', label = "Updated Bubble sort Avg time = " + str(round(bubbleTotal/n, 4)))
+    plt.plot(num_swaps, insertionData, color='red', label = "Updated Insertion sort Avg time = " + str(round(insertionTotal/n, 4)))
+    plt.plot(num_swaps, selectionData, color='green', label = "Updated Selection sort Avg time = " + str(round(selectionTotal/n, 4)))
+    
     plt.xlabel("Swaps")
     plt.ylabel("Time (s)")
     plt.title("Runtime analysis")
@@ -332,4 +348,6 @@ def experiment3():
 
 
 #Running the experiments
+#experiment1()
+#experiment2()
 experiment3()

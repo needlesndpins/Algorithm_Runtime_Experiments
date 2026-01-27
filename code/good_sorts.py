@@ -9,6 +9,35 @@ In contains traditional implementations for:
 
 Author: Vincent Maccio
 """
+import random
+import matplotlib.pyplot as plt
+import timeit
+import copy
+import math
+import sys
+sys.setrecursionlimit(10000)
+
+def create_random_list(length, max_value):
+    return [random.randint(0, max_value) for _ in range(length)]
+
+# I have created this function to make the sorting algorithm code read easier
+def swap(L, i, j):
+    L[i], L[j] = L[j], L[i]
+
+
+
+# Creates a near sorted list by creating a random list, sorting it, then doing a random number of swaps
+# Swaps = 0 -> List is sorted 
+def create_near_sorted_list(length, max_value, swaps):
+    L = create_random_list(length, max_value)
+    L.sort()
+    for _ in range(swaps):
+        r1 = random.randint(0, length - 1)
+        r2 = random.randint(0, length - 1)
+        swap(L, r1, r2)
+    return L
+
+
 
 # ************ Quick Sort ************
 def quicksort(L):
@@ -147,3 +176,128 @@ class Heap:
 
 # *************************************
     
+def experiment4():
+    lengths = [2 ** x for x in range(20)]
+    max_value = 2 ** 30
+    randomLists = [create_random_list(x,max_value) for x in lengths]
+    n = len(lengths)
+    heapData = []
+    mergeData = []
+    quickData = []
+    heapTotal = 0
+    mergeTotal = 0
+    quickTotal = 0
+
+    for i in range(n):
+        L = randomLists[i]
+        L1 = copy.deepcopy(L)
+        L2 = copy.deepcopy(L)
+
+        start = timeit.default_timer()
+        heapsort(L)
+        end = timeit.default_timer() - start
+        heapTotal += end
+        heapData.append(end)
+
+        start = timeit.default_timer()
+        mergesort(L1)
+        end = timeit.default_timer() - start
+        mergeTotal += end
+        mergeData.append(end)
+
+        start = timeit.default_timer()
+        quicksort(L2)
+        end = timeit.default_timer() - start
+        quickTotal += end
+        quickData.append(end)
+
+
+
+
+    plt.plot(lengths, heapData, color='blue', label = "Heap sort")
+    plt.plot(lengths, mergeData, color='red', label = "Merge sort")
+    plt.plot(lengths, quickData, color='green', label = "Quick sort")
+
+    plt.xlabel("List Length")
+    plt.ylabel("Time (s)")
+    plt.title("Runtime analysis")
+    plt.legend()
+    plt.show()
+
+    return
+
+
+
+
+# Quicksort is O(n^2) for sorted and reverse sorted lists 
+# It will be beat by mergesort and heapsort 
+# How "non-sorted" does the array have to be until Quicksort starts to win again? 
+#  * Start at sorted array, and gradually become less sorted until you have a completely random array
+#  * Plot this 
+def experiment5():
+
+    length = 5000
+    max_value = 2 ** 30
+    # max_swaps = int(length*math.log(length) / 2)
+    max_swaps = 400
+    num_swaps = []
+    nearSortedLists = []
+    for x in range(0,max_swaps,16): 
+        nearSortedLists.append(create_near_sorted_list(length,max_value,x))
+        num_swaps.append(x)
+
+    print(len(nearSortedLists))
+
+
+    #n = max_swaps
+    n = len(nearSortedLists)
+    heapData = []
+    mergeData = []
+    quickData = []
+    heapTotal = 0
+    mergeTotal = 0
+    quickTotal = 0
+
+    for i in range(n):
+        print(i)
+        L = nearSortedLists[i]
+        L1 = copy.deepcopy(L)
+        L2 = copy.deepcopy(L)
+
+        start = timeit.default_timer()
+        heapsort(L)
+        end = timeit.default_timer() - start
+        heapTotal += end
+        heapData.append(end)
+
+        start = timeit.default_timer()
+        mergesort(L1)
+        end = timeit.default_timer() - start
+        mergeTotal += end
+        mergeData.append(end)
+
+        start = timeit.default_timer()
+        quicksort(L2)
+        end = timeit.default_timer() - start
+        quickTotal += end
+        quickData.append(end)
+
+
+
+
+
+    # Need to accurately capture number of swaps per iteration, this doesn't do that
+    plt.plot(num_swaps, heapData, color='blue', label = "Heapsort Avg time = " + str(round(heapTotal/n, 4)))
+    plt.plot(num_swaps, mergeData, color='red', label = "Mergesort Avg time = " + str(round(mergeTotal/n, 4)))
+    plt.plot(num_swaps, quickData, color='green', label = "Quicksort Avg time = " + str(round(quickTotal/n, 4)))
+    
+    plt.xlabel("Swaps")
+    plt.ylabel("Time (s)")
+    plt.title("Runtime analysis")
+    plt.legend()
+    plt.show()
+
+    return
+
+
+experiment5()
