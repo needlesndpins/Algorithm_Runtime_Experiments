@@ -46,12 +46,13 @@ def quicksort(L):
         L[i] = copy[i]
 
 
+# Handles quicksort logic
 def quicksort_copy(L):
     if len(L) < 2:
         return L
-    pivot = L[0]
-    left, right = [], []
-    for num in L[1:]:
+    pivot = L[0] #Pick pivot as first element
+    left, right = [], [] #Create a left, right array
+    for num in L[1:]: # For elements in array (excluding first element, removed pivot)
         if num < pivot:
             left.append(num)
         else:
@@ -59,6 +60,61 @@ def quicksort_copy(L):
     return quicksort_copy(left) + [pivot] + quicksort_copy(right)
 
 # *************************************
+
+
+
+# ******************* Dual quicksort code *******************
+def dual_quicksort(L):
+    copy = dual_quicksort_copy(L)
+    for i in range(len(L)):
+        L[i] = copy[i]
+
+
+def dual_quicksort_copy(L):
+
+    if len(L) < 2:
+        return L
+    
+    ind1 = 0
+    ind2 = len(L) // 2
+    
+
+    pivot = L[ind1] 
+    pivot2 = L[ind2]
+
+    max_pivot = max(pivot,pivot2)
+    min_pivot = min(pivot,pivot2)
+
+
+    left, middle, right = [], [], []
+
+    # left - all elements less than both pivots (key < min_pivot)
+    # middle - all elements between both pivots (min pivot <= key <= max_pivot)
+    # right - all elements greater than both pivots (key > max_pivot)
+
+
+    # if max_pivot == min_pivot, it devolves to the one pivot case
+    if max_pivot == min_pivot: 
+        for i in range(len(L)):
+            if i != ind1 and i != ind2: 
+                if L[i] < min_pivot:
+                    left.append(L[i])
+                else:
+                    right.append(L[i])
+        return dual_quicksort_copy(left) + [min_pivot,max_pivot] + dual_quicksort_copy(right)
+
+    else: 
+        for i in range(len(L)):
+            if i != ind1 and i != ind2: 
+                if L[i] < min_pivot:
+                    left.append(L[i])
+                elif L[i] > max_pivot: 
+                    right.append(L[i])
+                else: 
+                    middle.append(L[i])
+
+        return dual_quicksort_copy(left) + [min_pivot] + dual_quicksort_copy(middle) + [max_pivot] + dual_quicksort_copy(right)
+
 
 
 # ************ Merge Sort *************
@@ -239,10 +295,10 @@ def experiment5():
     length = 5000
     max_value = 2 ** 30
     # max_swaps = int(length*math.log(length) / 2)
-    max_swaps = 400
+    max_swaps = 800
     num_swaps = []
     nearSortedLists = []
-    for x in range(0,max_swaps,16): 
+    for x in range(0,max_swaps,int(max_swaps/25)): 
         nearSortedLists.append(create_near_sorted_list(length,max_value,x))
         num_swaps.append(x)
 
@@ -285,8 +341,6 @@ def experiment5():
 
 
 
-
-    # Need to accurately capture number of swaps per iteration, this doesn't do that
     plt.plot(num_swaps, heapData, color='blue', label = "Heapsort Avg time = " + str(round(heapTotal/n, 4)))
     plt.plot(num_swaps, mergeData, color='red', label = "Mergesort Avg time = " + str(round(mergeTotal/n, 4)))
     plt.plot(num_swaps, quickData, color='green', label = "Quicksort Avg time = " + str(round(quickTotal/n, 4)))
@@ -300,4 +354,48 @@ def experiment5():
     return
 
 
-experiment5()
+def experiment6(): 
+    lengths = [2 ** x for x in range(20)]
+    max_value = 2 ** 30
+    randomLists = [create_random_list(x,max_value) for x in lengths]
+    n = len(lengths)
+    quickData = []
+    dualQuickData = []
+
+    quickTotal = 0
+    dualQuickTotal = 0
+
+    # Compare runtime
+    for i in range(n):
+        L = randomLists[i]
+        L1 = copy.deepcopy(L)
+
+        start = timeit.default_timer()
+        quicksort(L)
+        end = timeit.default_timer() - start
+        quickTotal += end
+        quickData.append(end)
+
+
+        start = timeit.default_timer()
+        dual_quicksort(L1)
+        end = timeit.default_timer() - start
+        dualQuickTotal += end
+        dualQuickData.append(end)
+
+
+    plt.plot(lengths, quickData, color='red', label = "Quicksort Avg time = " + str(round(quickTotal/n, 4)) )
+    plt.plot(lengths, dualQuickData, color='blue', label = "Dual Quicksort Avg time = " + str(round(dualQuickTotal/n, 4)))
+
+
+    plt.xlabel("List Length")
+    plt.ylabel("Time (s)")
+    plt.title("Runtime analysis")
+    plt.legend()
+    plt.show()
+
+
+    return 
+
+
+experiment6()
